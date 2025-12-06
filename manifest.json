@@ -1,0 +1,11 @@
+{
+	"id": "line-count-display",
+	"name": "Line Count",
+	"version": "1.0.0",
+	"minAppVersion": "1.9.0",
+	"description": "Adds the number of lines in active document to status bar.",
+	"author": "Leonardo Laurindo",
+	"authorUrl": "https://github.com/leolaurindo",
+	"fundingUrl": "",
+	"isDesktopOnly": false
+}
