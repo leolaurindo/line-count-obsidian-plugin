@@ -1,5 +1,5 @@
-import { App, Plugin, MarkdownView, PluginSettingTab, Setting } from 'obsidian';
-import { ViewPlugin, ViewUpdate } from '@codemirror/view';
+import { App, Editor, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
 
 interface LineCountSettings {
   label: string;
@@ -20,8 +20,8 @@ export default class LineCountPlugin extends Plugin {
 
     const ext = ViewPlugin.fromClass(
       class {
-        view: any;
-        constructor(view: any) { this.view = view; updateLineCount(); }
+        view: EditorView;
+        constructor(view: EditorView) { this.view = view; updateLineCount(); }
         update(update: ViewUpdate) { if (update.docChanged) updateLineCount(); }
       }
     );
@@ -52,16 +52,16 @@ export default class LineCountPlugin extends Plugin {
     const mv = this.app.workspace.getActiveViewOfType(MarkdownView);
     const label = this.getLabel();
     if (!mv || !this.statusEl) return;
-    const editorView = (mv as any).editor?.cm || (mv as any).editor?.view || (mv as any).editor; // defensive
-    if (editorView?.state?.doc) {
+    const editorWithView = mv.editor as Editor & { cm?: EditorView; view?: EditorView };
+    const editorView = editorWithView.cm ?? editorWithView.view;
+    if (editorView?.state.doc) {
       const lines = editorView.state.doc.toString().split(/\r\n|\r|\n/).length;
       this.statusEl.setText(`${lines} ${label}`);
       return;
     }
     // fallback using the simple Editor API
     try {
-      const ed = mv.editor;
-      const lines = ed ? ed.lineCount() : 0;
+      const lines = mv.editor ? mv.editor.lineCount() : 0;
       this.statusEl.setText(`${lines} ${label}`);
     } catch {
       this.statusEl.setText('');
@@ -89,11 +89,14 @@ class LineCountSettingTab extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl('h2', { text: 'Line Count' });
+
+    new Setting(containerEl)
+      .setName('Line count')
+      .setHeading();
 
     new Setting(containerEl)
       .setName('Label')
-      .setDesc('Word to show after the count (e.g. lines, lineas, linhas, rows).')
+      .setDesc('Optional text after the count')
       .addText((text) => text
         .setPlaceholder(DEFAULT_SETTINGS.label)
         .setValue(this.plugin.settings.label)
