@@ -91,11 +91,11 @@ class LineCountSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName('Line count')
+      .setName('Display settings')
       .setHeading();
 
     new Setting(containerEl)
-      .setName('Label')
+      .setName('Displayed text')
       .setDesc('Optional text after the count')
       .addText((text) => text
         .setPlaceholder(DEFAULT_SETTINGS.label)
