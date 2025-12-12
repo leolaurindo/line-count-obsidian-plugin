@@ -91,7 +91,7 @@ class LineCountSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName('Display settings')
+      .setName('Status bar display')
       .setHeading();
 
     new Setting(containerEl)
